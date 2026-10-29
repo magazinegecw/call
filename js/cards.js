@@ -15,6 +15,7 @@
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const isTouch = window.matchMedia('(hover: none), (pointer: coarse)').matches;
+  let isMobile = window.innerWidth <= 768;
 
   /* ── Magazine Editorial Vocabulary ── */
   const WORDS = [
@@ -195,9 +196,9 @@
       const elemW = el.offsetWidth || 70;
       const elemH = el.offsetHeight || 22;
 
-      // Motion drift amplitudes
-      const ampX = rand(2, isMobile ? 4 : 8);
-      const ampY = rand(1.5, isMobile ? 3 : 6);
+      // Motion drift amplitudes: graceful, living editorial float
+      const ampX = rand(isMobile ? 4.5 : 7, isMobile ? 8.5 : 14);
+      const ampY = rand(isMobile ? 3.5 : 5, isMobile ? 7 : 11);
 
       // Determine candidate zones where this element can fit
       // 0 = Top band, 1 = Bottom band, 2 = Left column, 3 = Right column
@@ -301,10 +302,10 @@
           rotation,
           ampX,
           ampY,
-          freqX: rand(0.0003, 0.00065),
-          freqY: rand(0.0003, 0.0006),
+          freqX: rand(0.00045, 0.00085),
+          freqY: rand(0.0004, 0.00078),
           phase: rand(0, Math.PI * 2),
-          parallax: isMobile ? 0 : (size > 2.0 ? rand(10, 18) : rand(3, 8)),
+          parallax: isMobile ? 0 : (size > 2.0 ? rand(12, 20) : rand(5, 10)),
           revealed: false
         });
       } else {
@@ -334,8 +335,8 @@
       layer.appendChild(del);
       const dW = del.offsetWidth || 14;
       const dH = del.offsetHeight || 14;
-      const ampX = 1.5;
-      const ampY = 1.5;
+      const ampX = isMobile ? 3.5 : 5.5;
+      const ampY = isMobile ? 3 : 4.5;
 
       let placed = false;
       let chosenX = 0;
@@ -386,8 +387,8 @@
           rotation: 0,
           ampX,
           ampY,
-          freqX: rand(0.0004, 0.0007),
-          freqY: rand(0.0003, 0.00065),
+          freqX: rand(0.0005, 0.0009),
+          freqY: rand(0.00045, 0.0008),
           phase: rand(0, Math.PI * 2),
           parallax: 0,
           revealed: false
@@ -476,11 +477,11 @@
       }
 
       // Subtle rotation drift
-      const rotWobble = Math.sin(elapsed * 0.0003 + it.phase) * 1.1;
+      const rotWobble = Math.sin(elapsed * 0.0004 + it.phase) * (isMobile ? 1.6 : 2.2);
       const totalRot = it.rotation + rotWobble;
 
       // Gentle breathing opacity
-      const breathe = it.curOp * (0.94 + 0.06 * Math.sin(elapsed * 0.0009 + it.phase));
+      const breathe = it.curOp * (0.92 + 0.08 * Math.sin(elapsed * 0.0009 + it.phase));
 
       it.el.style.opacity = breathe.toFixed(3);
       it.el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) rotate(${totalRot.toFixed(1)}deg)`;
@@ -502,6 +503,7 @@
       return;
     }
     lastWidth = currentWidth;
+    isMobile = currentWidth <= 768;
 
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
@@ -513,6 +515,7 @@
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
       lastWidth = window.innerWidth;
+      isMobile = lastWidth <= 768;
       build();
     }, 300);
   }
@@ -520,6 +523,7 @@
   /* ── Init ── */
   function init() {
     lastWidth = window.innerWidth;
+    isMobile = lastWidth <= 768;
     build();
     if (!reducedMotion) {
       window.addEventListener('mousemove', onMouseMove, { passive: true });
