@@ -10,6 +10,7 @@
 
   const layer = document.getElementById('floating-cards-layer');
   const headlineWrap = document.querySelector('.hero-headline-wrap');
+  const hero = document.querySelector('.hero-section');
   if (!layer) return;
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -82,10 +83,12 @@
 
   /**
    * Calculate central headline exclusion box with safety padding.
+   * Uses relative coordinates to hero container so scrolling never distorts measurements.
    */
   function getHeadlineExclusion() {
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
+    const heroRect = hero ? hero.getBoundingClientRect() : (layer ? layer.getBoundingClientRect() : { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight });
+    const vw = heroRect.width || window.innerWidth;
+    const vh = heroRect.height || window.innerHeight;
     const isMobile = vw <= 768;
 
     if (!headlineWrap) {
@@ -101,11 +104,14 @@
     const padX = isMobile ? 18 : 36;
     const padY = isMobile ? 16 : 30;
 
+    const relLeft = rect.left - heroRect.left;
+    const relTop = rect.top - heroRect.top;
+
     return {
-      left: Math.max(0, rect.left - padX),
-      right: Math.min(vw, rect.right + padX),
-      top: Math.max(0, rect.top - padY),
-      bottom: Math.min(vh, rect.bottom + padY)
+      left: Math.max(0, relLeft - padX),
+      right: Math.min(vw, relLeft + rect.width + padX),
+      top: Math.max(0, relTop - padY),
+      bottom: Math.min(vh, relTop + rect.height + padY)
     };
   }
 
@@ -484,21 +490,41 @@
   }
 
   /* ── Resize & Orientation Handler ── */
+  let lastWidth = window.innerWidth;
   let resizeTimer;
+
   function onResize() {
+    const currentWidth = window.innerWidth;
+    // On mobile devices, scrolling vertically shows/hides the browser address bar,
+    // which dispatches a window resize event. If width has not changed, ignore it
+    // so typography cards never vanish or re-render during scroll.
+    if (Math.abs(currentWidth - lastWidth) < 15) {
+      return;
+    }
+    lastWidth = currentWidth;
+
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
       build();
-    }, 200);
+    }, 250);
+  }
+
+  function onOrientationChange() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      lastWidth = window.innerWidth;
+      build();
+    }, 300);
   }
 
   /* ── Init ── */
   function init() {
+    lastWidth = window.innerWidth;
     build();
     if (!reducedMotion) {
       window.addEventListener('mousemove', onMouseMove, { passive: true });
       window.addEventListener('resize', onResize);
-      window.addEventListener('orientationchange', onResize);
+      window.addEventListener('orientationchange', onOrientationChange);
       rafId = requestAnimationFrame(tick);
     }
   }
