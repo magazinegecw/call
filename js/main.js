@@ -7,64 +7,9 @@
   'use strict';
 
   function initApp() {
-    setupSearchModal();
     setupContactModal();
     setupYellowApplyBadge();
     setupBackToTop();
-    setupKeyboardShortcuts();
-  }
-
-  // -------------------------------------------------------------------------
-  // SEARCH MODAL / QUICK INFO DIALOG
-  // -------------------------------------------------------------------------
-  function setupSearchModal() {
-    const searchBtn = document.querySelector('.nav-search-btn');
-    const modal = document.getElementById('search-info-modal');
-    const closeBtn = document.querySelector('.modal-close-btn');
-
-    if (!searchBtn || !modal) return;
-
-    function openModal() {
-      modal.classList.add('open');
-      document.body.style.overflow = 'hidden';
-      const searchInput = modal.querySelector('.modal-search-input');
-      if (searchInput) {
-        searchInput.value = '';
-        setTimeout(() => searchInput.focus(), 100);
-      }
-    }
-
-    function closeModal() {
-      modal.classList.remove('open');
-      document.body.style.overflow = '';
-    }
-
-    searchBtn.addEventListener('click', openModal);
-    if (closeBtn) closeBtn.addEventListener('click', closeModal);
-
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) closeModal();
-    });
-
-    // Simple instant filter in search modal
-    const searchInput = modal.querySelector('.modal-search-input');
-    const items = modal.querySelectorAll('.modal-result-item');
-    if (searchInput) {
-      searchInput.addEventListener('input', () => {
-        const query = searchInput.value.toLowerCase().trim();
-        items.forEach((item) => {
-          const text = item.textContent.toLowerCase();
-          item.style.display = text.includes(query) ? 'flex' : 'none';
-        });
-      });
-    }
-
-    // Escape closes modal
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && modal.classList.contains('open')) {
-        closeModal();
-      }
-    });
   }
 
   // -------------------------------------------------------------------------
@@ -144,20 +89,6 @@
         window.AppScroll.scrollTo(0);
       } else {
         window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-    });
-  }
-
-  // -------------------------------------------------------------------------
-  // KEYBOARD ACCESSIBILITY HELPER
-  // -------------------------------------------------------------------------
-  function setupKeyboardShortcuts() {
-    window.addEventListener('keydown', (e) => {
-      // Cmd/Ctrl + K opens search
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        const searchBtn = document.querySelector('.nav-search-btn');
-        if (searchBtn) searchBtn.click();
       }
     });
   }

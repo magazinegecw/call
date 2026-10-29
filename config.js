@@ -5,8 +5,14 @@
  */
 
 const CONFIG = {
-  // Replace <FORM_ID> with your actual Google Form ID
-  // e.g., "https://docs.google.com/forms/d/e/1FAIpQLSc_ExampleID1234567890/formResponse"
+  // Google OAuth 2.0 Web Client ID
+  GOOGLE_CLIENT_ID: "744983244688-6d38pk46c339nfoheleq6hon93556gbt.apps.googleusercontent.com",
+
+  // Google Apps Script Web App Deployment URL
+  // Replace with your deployed Web App URL (e.g. "https://script.google.com/macros/s/AKfycbx.../exec")
+  APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbxLoTAa-GdgBl28oTnYFuHqwd_TN0L7zccCEwqm-NnKOwBGXcUSCsYkN2BwiJkJhU6C/exec",
+
+  // Fallback direct Google Form action URL (legacy / backup)
   FORM_ACTION_URL: "https://docs.google.com/forms/d/e/<FORM_ID>/formResponse",
 
   // Field Entry IDs from your Google Form (entry.XXXXXXXXXX)

@@ -92,13 +92,272 @@
   color: var(--text-muted);
 }
 
-/* Wizard Form Body */
-.wizard-body {
-  padding: 1.5rem clamp(1.5rem, 4vw, 3rem) 2.5rem clamp(1.5rem, 4vw, 3rem);
-  min-height: 380px;
+/* --------------------------------------------------------------------------
+   GOOGLE IDENTITY SERVICES AUTHENTICATION BAR
+   -------------------------------------------------------------------------- */
+.google-auth-bar {
+  background-color: #FAF8F5;
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 1rem clamp(1.2rem, 3.5vw, 2.5rem);
+  transition: all var(--transition-fast);
+}
+
+.google-signin-prompt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.google-prompt-text {
   display: flex;
   flex-direction: column;
+  gap: 0.2rem;
+}
+
+.google-prompt-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  letter-spacing: -0.01em;
+}
+
+.google-prompt-subtitle {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.g-signin-btn-wrap {
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+}
+
+/* Signed In Profile Badge */
+.google-profile-badge {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.profile-info-group {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.google-user-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid var(--accent-orange);
+  background-color: var(--bg-cream);
+}
+
+.profile-text-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-status-tag {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--success-green);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.profile-user-name {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.profile-user-email {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.google-signout-btn {
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.google-signout-btn:hover {
+  color: var(--error-red);
+  border-color: var(--error-red);
+  background-color: rgba(220, 38, 38, 0.05);
+}
+
+@keyframes authPromptPulse {
+  0%, 100% {
+    transform: translateY(0);
+    box-shadow: inset 0 0 0 2px var(--accent-orange), 0 4px 18px rgba(255, 90, 31, 0.25);
+  }
+  25%, 75% {
+    transform: translateY(-2px);
+    box-shadow: inset 0 0 0 2.5px var(--accent-orange), 0 6px 24px rgba(255, 90, 31, 0.35);
+  }
+  50% {
+    transform: translateY(2px);
+    box-shadow: inset 0 0 0 2px var(--accent-orange), 0 4px 18px rgba(255, 90, 31, 0.25);
+  }
+}
+
+.google-auth-bar.highlight-required {
+  background-color: #FFF8F3;
+  border-color: var(--accent-orange);
+  animation: authPromptPulse 0.5s ease-in-out;
+  box-shadow: inset 0 0 0 2px var(--accent-orange), 0 4px 18px rgba(255, 90, 31, 0.25);
+}
+
+.google-prompt-alert {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--accent-orange);
+  letter-spacing: 0.02em;
+  margin-top: 0.3rem;
+  animation: fadeIn 0.2s ease;
+}
+
+/* --------------------------------------------------------------------------
+   FORM LOCK & PROTECTED FILLING STATE
+   -------------------------------------------------------------------------- */
+#recruitment-form {
+  position: relative;
+}
+
+.form-lock-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(2.5px);
+  -webkit-backdrop-filter: blur(2.5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  cursor: pointer;
+  transition: opacity 0.28s ease, visibility 0.28s ease;
+}
+
+#recruitment-form:not(.is-locked) .form-lock-overlay {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+#recruitment-form.is-locked .wizard-body,
+#recruitment-form.is-locked .wizard-footer {
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.lock-notice-card {
+  background: #FFFFFF;
+  border: 1.5px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.6rem 1.8rem;
+  max-width: 380px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+  cursor: pointer;
+  transform: translateY(0);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.lock-notice-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12), 0 3px 8px rgba(0, 0, 0, 0.05);
+}
+
+.lock-icon-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 90, 31, 0.1);
+  color: var(--accent-orange);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.2rem;
+}
+
+.lock-title {
+  font-size: 1.12rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-dark);
+  margin: 0;
+}
+
+.lock-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.btn-lock-prompt {
+  margin-top: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.65rem 1.35rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  background-color: var(--text-dark);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-lock-prompt:hover {
+  background-color: #000000;
+  transform: translateY(-1px);
+}
+
+.lock-notice-card.shake {
+  animation: lockCardShake 0.45s ease-in-out;
+}
+
+@keyframes lockCardShake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+/* Wizard Form Body */
+.wizard-body {
+  padding: 1.5rem clamp(1.2rem, 3.5vw, 3rem) 0.35rem clamp(1.2rem, 3.5vw, 3rem);
+  min-height: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Question Steps */
@@ -126,7 +385,7 @@
 }
 
 .step-question-group {
-  margin-bottom: 2rem;
+  margin-bottom: 0.85rem;
 }
 
 .step-label {
@@ -146,7 +405,7 @@
 .step-helper {
   font-size: 0.88rem;
   color: var(--text-muted);
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.95rem;
 }
 
 /* Form Inputs */
@@ -189,91 +448,98 @@
 }
 
 /* --------------------------------------------------------------------------
-   STEP 2: CUSTOM BRANCH DROPDOWN
+   STEP 2: SINGLE-SELECT BRANCH OPTIONS
    -------------------------------------------------------------------------- */
-.custom-dropdown-wrap {
-  position: relative;
-  width: 100%;
+.branch-cards-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
 }
 
-.dropdown-trigger {
-  width: 100%;
-  padding: 1.05rem 1.25rem;
+.branch-card-choice {
+  position: relative;
   background-color: var(--bg-cream);
   border: 1.5px solid transparent;
   border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text-dark);
+  padding: 0.9rem 1.15rem;
   cursor: pointer;
   transition: all var(--transition-fast);
-  text-align: left;
-}
-
-.dropdown-trigger:hover {
-  background-color: #EAE6DF;
-}
-
-.dropdown-trigger:focus, .dropdown-trigger.open {
-  background-color: #FFFFFF;
-  border-color: var(--accent-orange);
-  box-shadow: 0 0 0 4px rgba(255, 90, 31, 0.12);
-  outline: none;
-}
-
-.dropdown-trigger svg {
-  transition: transform var(--transition-fast);
-  color: var(--text-muted);
-}
-
-.dropdown-trigger.open svg {
-  transform: rotate(180deg);
-}
-
-.dropdown-menu-list {
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 0;
-  width: 100%;
-  background: #FFFFFF;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
-  max-height: 280px;
-  overflow-y: auto;
-  z-index: 50;
-  display: none;
-  padding: 0.5rem;
-}
-
-.dropdown-menu-list.open {
-  display: block;
-}
-
-.dropdown-option-item {
-  padding: 0.85rem 1rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.95rem;
-  font-weight: 550;
-  color: var(--text-dark);
-  cursor: pointer;
-  transition: background var(--transition-fast);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  text-align: left;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.dropdown-option-item:hover, .dropdown-option-item.highlighted {
-  background-color: var(--bg-cream);
+.branch-card-choice:hover {
+  background-color: #E8E4DD;
+  transform: translateY(-1px);
 }
 
-.dropdown-option-item.selected {
-  background-color: rgba(255, 90, 31, 0.08);
-  color: var(--accent-orange);
+.branch-card-choice:focus-visible {
+  outline: none;
+  border-color: var(--accent-orange);
+  box-shadow: 0 0 0 3px rgba(255, 90, 31, 0.15);
+}
+
+.branch-card-choice.selected {
+  background-color: #FFFFFF;
+  border-color: var(--accent-orange);
+  box-shadow: 0 4px 16px rgba(255, 90, 31, 0.12);
+}
+
+.branch-card-choice input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.branch-card-info {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  min-width: 0;
+}
+
+.branch-card-badge {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
   font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--accent-orange);
+  background-color: rgba(255, 90, 31, 0.09);
+  padding: 0.22rem 0.55rem;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+.branch-card-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  line-height: 1.25;
+}
+
+.branch-card-indicator {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #D1CCC4;
+  background: #FFFFFF;
+  flex-shrink: 0;
+  margin-left: 0.75rem;
+  transition: all var(--transition-fast);
+}
+
+.branch-card-choice:hover .branch-card-indicator {
+  border-color: var(--text-muted);
+}
+
+.branch-card-choice.selected .branch-card-indicator {
+  border-color: var(--accent-orange);
+  background: var(--accent-orange);
+  box-shadow: inset 0 0 0 3px #FFFFFF;
 }
 
 /* --------------------------------------------------------------------------
@@ -585,7 +851,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-top: 1.5rem;
+  padding: 0.85rem clamp(1.2rem, 3.5vw, 3rem) 1.25rem clamp(1.2rem, 3.5vw, 3rem);
+  margin-top: 0.15rem;
   border-top: 1px solid #F0EDE8;
 }
 

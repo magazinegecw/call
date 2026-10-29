@@ -1,0 +1,177 @@
+/* ==========================================================================
+   SECTION: TEAMS OVERVIEW DIRECTORY
+   Compact, elegant informational overview of the 5 creative teams
+   ========================================================================== */
+
+.teams-overview-section {
+  background-color: var(--bg-cream);
+  position: relative;
+  z-index: 10;
+  padding-top: clamp(3rem, 5vw, 4.5rem);
+  padding-bottom: clamp(4rem, 7vw, 6rem);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.teams-container {
+  width: 100%;
+  max-width: 960px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(1.2rem, 3vw, 2.5rem);
+  padding-right: clamp(1.2rem, 3vw, 2.5rem);
+}
+
+.teams-header {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto clamp(2rem, 4vw, 3rem) auto;
+}
+
+.teams-badge {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-orange);
+  background-color: rgba(255, 90, 31, 0.08);
+  border: 1px solid rgba(255, 90, 31, 0.2);
+  padding: 0.32rem 0.85rem;
+  border-radius: var(--radius-pill);
+  margin-bottom: 0.85rem;
+}
+
+.teams-title {
+  font-size: clamp(1.85rem, 3.5vw, 2.6rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--text-dark);
+  margin-bottom: 0.65rem;
+  line-height: 1.18;
+}
+
+.teams-desc {
+  font-size: clamp(0.92rem, 1.8vw, 1.02rem);
+  color: var(--text-muted);
+  line-height: 1.55;
+  margin: 0 auto;
+}
+
+.teams-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+
+.team-card {
+  background-color: #FFFFFF;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1.5rem 1.65rem;
+  display: flex;
+  flex-direction: column;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+}
+
+.team-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(20, 20, 20, 0.22);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.05);
+}
+
+.team-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.team-card-icon-wrap {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-cream);
+  color: var(--accent-orange);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background-color var(--transition-fast);
+}
+
+.team-card:hover .team-card-icon-wrap {
+  background-color: rgba(255, 90, 31, 0.12);
+}
+
+.team-card-title {
+  font-size: 1.12rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--text-dark);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.team-card-prefix {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--accent-orange);
+  letter-spacing: 0.02em;
+}
+
+.team-card-desc {
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+  margin-top: 0.8rem;
+  margin-bottom: 0;
+}
+
+/* 05 Newsletter Team spans both columns on desktop */
+.team-card.card-span-2 {
+  grid-column: span 2;
+}
+
+.team-card.card-span-2 .team-card-desc {
+  max-width: 720px;
+}
+
+/* Mobile & Tablet Responsiveness */
+@media (max-width: 768px) {
+  .teams-overview-section {
+    padding-top: 2.75rem;
+    padding-bottom: 3.5rem;
+  }
+
+  .teams-header {
+    margin-bottom: 1.75rem;
+  }
+
+  .teams-grid {
+    grid-template-columns: 1fr;
+    gap: 0.95rem;
+  }
+
+  .team-card.card-span-2 {
+    grid-column: span 1;
+  }
+
+  .team-card {
+    padding: 1.25rem 1.25rem;
+  }
+
+  .team-card-title {
+    font-size: 1.05rem;
+  }
+
+  .team-card-desc {
+    font-size: 0.85rem;
+    margin-top: 0.65rem;
+  }
+}
+

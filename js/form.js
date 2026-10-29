@@ -12,6 +12,10 @@
   const totalSteps = 10; // Steps 1-9 are fields; Step 10 is Review & Submit
   let isSubmitting = false;
 
+  // Google Identity State (Stored in memory only, never persisted to disk or storage)
+  let googleIdToken = null;
+  let googleUser = null;
+
   const formData = {
     fullName: '',
     branch: '',
@@ -44,12 +48,8 @@
   const declarationCard = document.getElementById('card-declaration');
   const declarationCheckbox = document.getElementById('field-declaration');
 
-  // Custom Dropdown for Branch
-  const branchDropdownWrap = document.querySelector('.custom-dropdown-wrap');
-  const branchTrigger = document.querySelector('.dropdown-trigger');
-  const branchTriggerText = document.querySelector('.dropdown-trigger-text');
-  const branchMenuList = document.querySelector('.dropdown-menu-list');
-  const branchOptions = document.querySelectorAll('.dropdown-option-item');
+  // Branch Cards
+  const branchCards = document.querySelectorAll('.branch-card-choice');
 
   // Year Cards
   const yearCards = document.querySelectorAll('.year-card-choice');
@@ -63,7 +63,9 @@
 
   // Initialize Wizard
   function initWizard() {
-    setupBranchDropdown();
+    setupGoogleAuth();
+    setupFormLock();
+    setupBranchCards();
     setupYearCards();
     setupChips();
     setupRatingSegments();
@@ -76,63 +78,252 @@
   }
 
   // -------------------------------------------------------------------------
-  // STEP 2: CUSTOM BRANCH DROPDOWN
+  // GOOGLE IDENTITY SERVICES (GIS) AUTHENTICATION
   // -------------------------------------------------------------------------
-  function setupBranchDropdown() {
-    if (!branchTrigger || !branchMenuList) return;
+  function setupGoogleAuth() {
+    const authBar = document.getElementById('google-auth-bar');
+    const signinPrompt = document.getElementById('google-signin-prompt');
+    const profileBadge = document.getElementById('google-profile-badge');
+    const avatarEl = document.getElementById('google-user-avatar');
+    const nameEl = document.getElementById('google-user-name');
+    const emailEl = document.getElementById('google-user-email');
+    const signoutBtn = document.getElementById('google-signout-btn');
+    const btnWrap = document.getElementById('g-signin-btn-wrap');
 
-    branchTrigger.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const isOpen = branchMenuList.classList.contains('open');
-      if (isOpen) closeBranchDropdown();
-      else openBranchDropdown();
-    });
+    if (!authBar || !btnWrap) return;
 
-    branchOptions.forEach((option) => {
-      option.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const value = option.getAttribute('data-value');
-        const text = option.textContent.trim();
+    let retryCount = 0;
+    function initGIS() {
+      if (typeof google === 'undefined' || !google.accounts || !google.accounts.id) {
+        if (retryCount < 80) {
+          retryCount++;
+          setTimeout(initGIS, 150);
+        }
+        return;
+      }
 
-        formData.branch = value;
-        branchTriggerText.textContent = text;
-        branchTriggerText.style.color = 'var(--text-dark)';
+      if (!CONFIG.GOOGLE_CLIENT_ID) {
+        console.warn('CONFIG.GOOGLE_CLIENT_ID is not configured.');
+        return;
+      }
 
-        branchOptions.forEach((opt) => opt.classList.remove('selected'));
-        option.classList.add('selected');
-        closeBranchDropdown();
+      try {
+        google.accounts.id.initialize({
+          client_id: CONFIG.GOOGLE_CLIENT_ID,
+          callback: handleCredentialResponse,
+          auto_select: false,
+          cancel_on_tap_outside: true
+        });
+
+        google.accounts.id.renderButton(btnWrap, {
+          theme: 'filled_black',
+          size: 'medium',
+          shape: 'pill',
+          text: 'signin_with',
+          logo_alignment: 'left',
+          width: 230
+        });
+      } catch (err) {
+        console.warn('Error initializing Google Identity Services:', err);
+      }
+    }
+
+    window.addEventListener('load', initGIS);
+
+    function handleCredentialResponse(response) {
+      if (!response || !response.credential) return;
+
+      // Store raw ID token strictly in memory
+      googleIdToken = response.credential;
+
+      // Decode client payload strictly for immediate display
+      // (Backend will independently and cryptographically verify with Google)
+      try {
+        const base64Url = googleIdToken.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(
+          atob(base64)
+            .split('')
+            .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+            .join('')
+        );
+        googleUser = JSON.parse(jsonPayload);
+      } catch (e) {
+        console.warn('Could not parse token payload for UI preview:', e);
+        googleUser = { name: 'Google User', email: '', picture: '' };
+      }
+
+      // Update UI elements
+      if (avatarEl) {
+        if (googleUser && googleUser.picture) {
+          avatarEl.src = googleUser.picture;
+          avatarEl.style.display = 'block';
+        } else {
+          avatarEl.style.display = 'none';
+        }
+      }
+      if (nameEl) nameEl.textContent = (googleUser && googleUser.name) ? googleUser.name : 'Applicant';
+      if (emailEl) emailEl.textContent = (googleUser && googleUser.email) ? googleUser.email : '';
+
+      if (signinPrompt) signinPrompt.style.display = 'none';
+      if (profileBadge) profileBadge.style.display = 'flex';
+      authBar.classList.remove('highlight-required');
+
+      // Autofill full name if currently empty
+      if (inputFullName && !inputFullName.value.trim() && googleUser && googleUser.name) {
+        inputFullName.value = googleUser.name;
+        formData.fullName = googleUser.name;
+        clearFieldError(1);
+      }
+
+      // Unlock application form
+      unlockForm();
+
+      // If already on Review step, re-render to reflect signed-in account
+      if (currentStep === 10) {
+        renderReviewSummary();
+      }
+    }
+
+    if (signoutBtn) {
+      signoutBtn.addEventListener('click', () => {
+        googleIdToken = null;
+        googleUser = null;
+        if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+          google.accounts.id.disableAutoSelect();
+        }
+        if (profileBadge) profileBadge.style.display = 'none';
+        if (signinPrompt) signinPrompt.style.display = 'flex';
+        // Re-lock application form
+        lockForm();
+        if (currentStep === 10) {
+          renderReviewSummary();
+        }
+      });
+    }
+
+    initGIS();
+  }
+
+  // -------------------------------------------------------------------------
+  // FORM LOCK (REQUIRE GOOGLE SIGN-IN TO ACCESS FILLING SECTION)
+  // -------------------------------------------------------------------------
+  function highlightAuthPrompt() {
+    const authBar = document.getElementById('google-auth-bar');
+    const lockCard = document.querySelector('.lock-notice-card');
+    const alertEl = document.getElementById('google-prompt-alert');
+
+    if (lockCard) {
+      lockCard.classList.remove('shake');
+      void lockCard.offsetWidth; // Force reflow
+      lockCard.classList.add('shake');
+      setTimeout(() => lockCard.classList.remove('shake'), 450);
+    }
+
+    if (alertEl) {
+      alertEl.style.display = 'block';
+    }
+
+    if (authBar) {
+      authBar.classList.remove('highlight-required');
+      void authBar.offsetWidth; // Force reflow
+      authBar.classList.add('highlight-required');
+      authBar.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      // Focus Google Sign-in button wrapper if present
+      const gBtnWrap = document.getElementById('g-signin-btn-wrap');
+      if (gBtnWrap) {
+        const btnIframe = gBtnWrap.querySelector('iframe');
+        if (btnIframe) {
+          try {
+            btnIframe.focus();
+          } catch (_) {}
+        }
+      }
+
+      setTimeout(() => {
+        authBar.classList.remove('highlight-required');
+        if (alertEl) alertEl.style.display = 'none';
+      }, 2500);
+    }
+  }
+
+  function unlockForm() {
+    const formEl = document.getElementById('recruitment-form');
+    if (formEl) formEl.classList.remove('is-locked');
+  }
+
+  function lockForm() {
+    const formEl = document.getElementById('recruitment-form');
+    if (formEl) formEl.classList.add('is-locked');
+  }
+
+  function setupFormLock() {
+    const lockOverlay = document.getElementById('form-lock-overlay');
+    const lockBtn = document.getElementById('btn-lock-prompt');
+    const formEl = document.getElementById('recruitment-form');
+
+    function handleLockedTrigger(e) {
+      if (!googleIdToken) {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        highlightAuthPrompt();
+      }
+    }
+
+    if (lockOverlay) {
+      lockOverlay.addEventListener('click', handleLockedTrigger);
+      lockOverlay.addEventListener('touchstart', handleLockedTrigger, { passive: false });
+    }
+
+    if (lockBtn) {
+      lockBtn.addEventListener('click', handleLockedTrigger);
+    }
+
+    if (formEl) {
+      // Intercept accidental keyboard focus or click underneath the overlay
+      formEl.addEventListener('focusin', (e) => {
+        if (!googleIdToken) {
+          if (e.target && e.target.blur) e.target.blur();
+          highlightAuthPrompt();
+        }
+      });
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // STEP 2: BRANCH OPTIONS
+  // -------------------------------------------------------------------------
+  function setupBranchCards() {
+    branchCards.forEach((card) => {
+      card.addEventListener('click', () => {
+        const val = card.getAttribute('data-value');
+        formData.branch = val;
+
+        branchCards.forEach((c) => {
+          c.classList.remove('selected');
+          c.setAttribute('aria-checked', 'false');
+          const radio = c.querySelector('input[type="radio"]');
+          if (radio) radio.checked = false;
+        });
+
+        card.classList.add('selected');
+        card.setAttribute('aria-checked', 'true');
+        const radio = card.querySelector('input[type="radio"]');
+        if (radio) radio.checked = true;
+
         clearFieldError(2);
       });
+
+      card.addEventListener('keydown', (e) => {
+        if (e.key === ' ' || e.key === 'Enter') {
+          e.preventDefault();
+          card.click();
+        }
+      });
     });
-
-    // Close on click outside
-    document.addEventListener('click', (e) => {
-      if (!branchDropdownWrap.contains(e.target)) {
-        closeBranchDropdown();
-      }
-    });
-
-    // Keyboard navigation for dropdown
-    branchTrigger.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        openBranchDropdown();
-        const first = branchMenuList.querySelector('.dropdown-option-item');
-        if (first) first.focus();
-      }
-    });
-  }
-
-  function openBranchDropdown() {
-    branchMenuList.classList.add('open');
-    branchTrigger.classList.add('open');
-    branchTrigger.setAttribute('aria-expanded', 'true');
-  }
-
-  function closeBranchDropdown() {
-    branchMenuList.classList.remove('open');
-    branchTrigger.classList.remove('open');
-    branchTrigger.setAttribute('aria-expanded', 'false');
   }
 
   // -------------------------------------------------------------------------
@@ -294,6 +485,10 @@
         // If inside the wizard and not submitted
         if (wizardContainer && wizardContainer.contains(activeEl)) {
           e.preventDefault();
+          if (!googleIdToken) {
+            highlightAuthPrompt();
+            return;
+          }
           if (currentStep < totalSteps) {
             goToNextStep();
           } else if (currentStep === totalSteps) {
@@ -411,6 +606,10 @@
   // STEP TRANSITIONS & VIEW UPDATES
   // -------------------------------------------------------------------------
   function goToNextStep() {
+    if (!googleIdToken) {
+      highlightAuthPrompt();
+      return;
+    }
     if (!validateCurrentStep()) return;
 
     if (currentStep < totalSteps) {
@@ -494,6 +693,11 @@
 
     summaryContainer.innerHTML = `
       <div class="review-item">
+        <span class="review-label">Google Account</span>
+        <span class="review-value">${googleUser && googleUser.email ? `<span style="color: var(--success-green); font-weight: 700;">&#10003;</span> ${escapeHtml(googleUser.email)}` : `<span style="color: var(--error-red); font-weight: 600;">Not Signed In</span>`}</span>
+        <button type="button" class="review-edit-btn" id="review-signin-btn">${googleIdToken ? 'Switch' : 'Sign In'}</button>
+      </div>
+      <div class="review-item">
         <span class="review-label">Full Name</span>
         <span class="review-value">${escapeHtml(formData.fullName)}</span>
         <button type="button" class="review-edit-btn" data-step="1">Edit</button>
@@ -543,6 +747,10 @@
     // Attach edit buttons
     summaryContainer.querySelectorAll('.review-edit-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
+        if (btn.id === 'review-signin-btn') {
+          highlightAuthPrompt();
+          return;
+        }
         const stepNum = parseInt(btn.getAttribute('data-step'), 10);
         goToStep(stepNum);
       });
@@ -555,7 +763,7 @@
   }
 
   // -------------------------------------------------------------------------
-  // GOOGLE FORM SUBMISSION
+  // GOOGLE FORM SUBMISSION VIA SECURE APPS SCRIPT BACKEND
   // -------------------------------------------------------------------------
   async function handleFinalSubmission() {
     // Double-submit guard
@@ -564,8 +772,20 @@
     // Honeypot check (anti-bot)
     if (honeypot && honeypot.value.trim() !== '') {
       console.warn('Bot submission blocked via honeypot.');
-      // Quietly simulate success without submitting
       showSuccessScreen();
+      return;
+    }
+
+    // Require Google Authentication before submitting
+    if (!googleIdToken) {
+      highlightAuthPrompt();
+      if (errorBanner) {
+        const errText = errorBanner.querySelector('.error-text');
+        if (errText) {
+          errText.textContent = 'Please sign in with your Google account before submitting your application.';
+        }
+        errorBanner.classList.add('visible');
+      }
       return;
     }
 
@@ -573,74 +793,72 @@
     setSubmitLoading(true);
     if (errorBanner) errorBanner.classList.remove('visible');
 
-    // Build URLSearchParams
-    const params = new URLSearchParams();
-    const F = CONFIG.FIELDS;
+    // Check if Apps Script Web App URL is configured
+    const isAppsScriptConfigured = CONFIG.APPS_SCRIPT_URL && !CONFIG.APPS_SCRIPT_URL.includes('<SCRIPT_ID>');
 
-    params.append(F.fullName, formData.fullName);
-    params.append(F.branch, formData.branch);
-    params.append(F.year, formData.year);
-    params.append(F.phone, formData.phone);
-
-    // Multi-select: append same entry key once per selected value
-    formData.skills.forEach((skill) => {
-      params.append(F.skills, skill);
-    });
-
-    formData.software.forEach((sw) => {
-      params.append(F.software, sw);
-    });
-
-    params.append(F.rating, formData.rating);
-
-    if (formData.otherTalents) {
-      params.append(F.otherTalents, formData.otherTalents);
-    }
-
-    if (formData.declaration) {
-      params.append(
-        F.declaration,
-        'I am willing to contribute to the Magazine & Newsletter Team in a role that suits my skills and interests, and I am ready to learn, collaborate, and take responsibility for the tasks assigned to me.'
-      );
-    }
-
-    // Check if placeholder Google Form URL is in use
-    const isPlaceholderUrl = CONFIG.FORM_ACTION_URL.includes('<FORM_ID>');
-
-    if (isPlaceholderUrl) {
-      console.warn('Submission aborted: FORM_ACTION_URL in config.js still contains placeholder <FORM_ID>.');
+    if (!isAppsScriptConfigured) {
+      console.warn('Submission aborted: APPS_SCRIPT_URL in config.js is not configured.');
       isSubmitting = false;
       setSubmitLoading(false);
       if (errorBanner) {
         const errText = errorBanner.querySelector('.error-text');
         if (errText) {
-          errText.textContent = 'Google Form endpoint not configured. Please replace <FORM_ID> and field entry IDs in config.js.';
+          errText.textContent = 'Apps Script backend is not configured yet. Deploy Code.gs and update APPS_SCRIPT_URL in config.js.';
         }
         errorBanner.classList.add('visible');
       }
       return;
     }
 
-    // Submit to real Google Form formResponse endpoint with mode: "no-cors"
     try {
-      await fetch(CONFIG.FORM_ACTION_URL, {
+      const payload = {
+        idToken: googleIdToken,
+        formData: {
+          fullName: formData.fullName,
+          branch: formData.branch,
+          year: formData.year,
+          phone: formData.phone,
+          skills: formData.skills,
+          software: formData.software,
+          rating: formData.rating,
+          otherTalents: formData.otherTalents,
+          declaration: formData.declaration
+        }
+      };
+
+      // POST to Google Apps Script Web App
+      // Notice: Content-Type is 'text/plain;charset=utf-8' to prevent preflight CORS OPTIONS failure
+      const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
         method: 'POST',
-        mode: 'no-cors',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
+          'Content-Type': 'text/plain;charset=utf-8'
         },
-        body: params
+        body: JSON.stringify(payload)
       });
 
-      // In no-cors mode, the promise resolves on HTTP completion
-      isSubmitting = false;
-      setSubmitLoading(false);
-      showSuccessScreen();
+      if (!response.ok) {
+        throw new Error(`Server returned HTTP ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      if (result && result.status === 'success') {
+        isSubmitting = false;
+        setSubmitLoading(false);
+        showSuccessScreen();
+      } else {
+        const errMsg = (result && result.message) ? result.message : 'Submission was rejected by the server.';
+        throw new Error(errMsg);
+      }
     } catch (err) {
-      console.error('Submission failed with network error:', err);
+      console.error('Submission failed:', err);
       isSubmitting = false;
       setSubmitLoading(false);
       if (errorBanner) {
+        const errText = errorBanner.querySelector('.error-text');
+        if (errText) {
+          errText.textContent = err.message || 'Submission failed. Please check your internet connection and try again.';
+        }
         errorBanner.classList.add('visible');
       }
     }
@@ -669,14 +887,16 @@
   }
 
   function showSuccessScreen() {
-    // Hide wizard body & footer, show success card
+    // Hide wizard body, footer, header & auth bar; show success card
     const wizardBody = document.querySelector('.wizard-body');
     const wizardFooter = document.querySelector('.wizard-footer');
     const wizardHeader = document.querySelector('.wizard-card-header');
+    const authBar = document.getElementById('google-auth-bar');
 
     if (wizardBody) wizardBody.style.display = 'none';
     if (wizardFooter) wizardFooter.style.display = 'none';
     if (wizardHeader) wizardHeader.style.display = 'none';
+    if (authBar) authBar.style.display = 'none';
 
     if (successCard) {
       const applicantNameEl = successCard.querySelector('.applicant-name-slot');
@@ -708,11 +928,12 @@
     if (inputFullName) inputFullName.value = '';
     if (inputPhone) inputPhone.value = '';
     if (inputOtherTalents) inputOtherTalents.value = '';
-    if (branchTriggerText) {
-      branchTriggerText.textContent = 'Select your branch...';
-      branchTriggerText.style.color = 'var(--text-muted)';
-    }
-    branchOptions.forEach((o) => o.classList.remove('selected'));
+    branchCards.forEach((c) => {
+      c.classList.remove('selected');
+      c.setAttribute('aria-checked', 'false');
+      const radio = c.querySelector('input[type="radio"]');
+      if (radio) radio.checked = false;
+    });
     yearCards.forEach((c) => c.classList.remove('selected'));
     skillChips.forEach((c) => {
       c.classList.remove('selected');
@@ -734,11 +955,23 @@
     const wizardBody = document.querySelector('.wizard-body');
     const wizardFooter = document.querySelector('.wizard-footer');
     const wizardHeader = document.querySelector('.wizard-card-header');
+    const authBar = document.getElementById('google-auth-bar');
 
     if (wizardBody) wizardBody.style.display = 'flex';
     if (wizardFooter) wizardFooter.style.display = 'flex';
     if (wizardHeader) wizardHeader.style.display = 'flex';
+    if (authBar) authBar.style.display = '';
     if (successCard) successCard.classList.remove('visible');
+
+    if (googleIdToken) {
+      unlockForm();
+      if (inputFullName && googleUser && googleUser.name) {
+        inputFullName.value = googleUser.name;
+        formData.fullName = googleUser.name;
+      }
+    } else {
+      lockForm();
+    }
 
     updateStepView(1);
   };
