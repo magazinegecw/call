@@ -164,6 +164,8 @@
   /* Hero Headline */
   .hero-headline-wrap {
     padding: 1.5rem 1rem;
+    background: radial-gradient(ellipse 85% 80% at 50% 50%, rgba(239, 235, 229, 0.98) 0%, rgba(239, 235, 229, 0.82) 60%, rgba(239, 235, 229, 0) 100%);
+    border-radius: var(--radius-md);
   }
 
   .hero-headline {

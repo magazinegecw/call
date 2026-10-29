@@ -179,6 +179,8 @@
   padding: 2.5rem 2rem;
   pointer-events: auto;
   user-select: none;
+  background: radial-gradient(ellipse 70% 65% at 50% 50%, rgba(239, 235, 229, 0.96) 0%, rgba(239, 235, 229, 0.75) 55%, rgba(239, 235, 229, 0) 100%);
+  border-radius: var(--radius-lg);
 }
 
 .hero-tagline {

@@ -608,18 +608,16 @@
     const isPlaceholderUrl = CONFIG.FORM_ACTION_URL.includes('<FORM_ID>');
 
     if (isPlaceholderUrl) {
-      console.info(
-        '%c[GECW Execom Call] Demo Mode Active',
-        'background: #FF5A1F; color: #fff; font-weight: bold; padding: 4px 8px; border-radius: 4px;'
-      );
-      console.info('Form data ready for Google Form submission:', Object.fromEntries(params.entries()));
-      console.info('To submit to a real Google Form, replace <FORM_ID> and entry IDs in config.js.');
-
-      // Simulate network latency for authentic UI feedback
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      console.warn('Submission aborted: FORM_ACTION_URL in config.js still contains placeholder <FORM_ID>.');
       isSubmitting = false;
       setSubmitLoading(false);
-      showSuccessScreen();
+      if (errorBanner) {
+        const errText = errorBanner.querySelector('.error-text');
+        if (errText) {
+          errText.textContent = 'Google Form endpoint not configured. Please replace <FORM_ID> and field entry IDs in config.js.';
+        }
+        errorBanner.classList.add('visible');
+      }
       return;
     }
 
