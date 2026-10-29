@@ -1,8 +1,9 @@
 /**
  * HERO: MAGAZINE EDITORIAL TYPOGRAPHY WALL
- * Floating typography texture strictly constrained to perimeter safe zones.
- * Mathematically guarantees that floating words NEVER overlap or pass behind
- * the center headline text, subline, or Apply Now button on any screen.
+ * Strictly non-overlapping floating typography texture.
+ * Uses Axis-Aligned Bounding Box (AABB) spatial reservation to mathematically
+ * guarantee that cards NEVER overlap each other and NEVER overlap the central
+ * hero headline, subline, or Apply button on any screen.
  */
 (function () {
   'use strict';
@@ -17,49 +18,49 @@
   /* ── Magazine Editorial Vocabulary ── */
   const WORDS = [
     // Grand editorial watermarks
-    { t: 'EDITORIAL',   desktop: 4.0, mobile: 1.45, w: 800 },
-    { t: 'NARRATIVE',   desktop: 3.6, mobile: 1.35, w: 800 },
-    { t: 'TYPOGRAPHY',  desktop: 3.2, mobile: 1.3,  w: 800 },
-    { t: 'CHRONICLE',   desktop: 2.8, mobile: 1.25, w: 700 },
-    { t: 'CULTURE',     desktop: 2.6, mobile: 1.2,  w: 700 },
-    { t: 'DESIGN',      desktop: 2.4, mobile: 1.15, w: 700 },
+    { t: 'EDITORIAL',   desktop: 3.8, mobile: 1.35, w: 800 },
+    { t: 'NARRATIVE',   desktop: 3.4, mobile: 1.25, w: 800 },
+    { t: 'TYPOGRAPHY',  desktop: 3.0, mobile: 1.2,  w: 800 },
+    { t: 'CHRONICLE',   desktop: 2.6, mobile: 1.15, w: 700 },
+    { t: 'CULTURE',     desktop: 2.4, mobile: 1.1,  w: 700 },
+    { t: 'DESIGN',      desktop: 2.2, mobile: 1.05, w: 700 },
 
     // Medium display terms
-    { t: 'PRINT',       desktop: 2.2, mobile: 1.15, w: 700 },
-    { t: 'PRESS',       desktop: 2.1, mobile: 1.1,  w: 700 },
-    { t: 'GAZETTE',     desktop: 2.0, mobile: 1.1,  w: 700 },
-    { t: 'HEADLINE',    desktop: 1.9, mobile: 1.05, w: 700 },
-    { t: 'PUBLISH',     desktop: 1.85, mobile: 1.05, w: 600 },
-    { t: 'ARCHIVE',     desktop: 1.8, mobile: 1.0,  w: 700 },
-    { t: 'VISUAL',      desktop: 1.75, mobile: 1.0,  w: 600 },
-    { t: 'FEATURE',     desktop: 1.7, mobile: 0.95, w: 700 },
-    { t: 'SPREAD',      desktop: 1.6, mobile: 0.95, w: 600 },
-    { t: 'MONTAGE',     desktop: 1.5, mobile: 0.9,  w: 600 },
+    { t: 'PRINT',       desktop: 2.1, mobile: 1.05, w: 700 },
+    { t: 'PRESS',       desktop: 2.0, mobile: 1.0,  w: 700 },
+    { t: 'GAZETTE',     desktop: 1.9, mobile: 1.0,  w: 700 },
+    { t: 'HEADLINE',    desktop: 1.85, mobile: 0.95, w: 700 },
+    { t: 'PUBLISH',     desktop: 1.8, mobile: 0.95, w: 600 },
+    { t: 'ARCHIVE',     desktop: 1.75, mobile: 0.9,  w: 700 },
+    { t: 'VISUAL',      desktop: 1.7, mobile: 0.9,  w: 600 },
+    { t: 'FEATURE',     desktop: 1.6, mobile: 0.88, w: 700 },
+    { t: 'SPREAD',      desktop: 1.5, mobile: 0.88, w: 600 },
+    { t: 'MONTAGE',     desktop: 1.45, mobile: 0.85, w: 600 },
 
     // Fine editorial tags & metadata
-    { t: 'INK',         desktop: 1.3, mobile: 0.88, w: 700 },
-    { t: 'STORY',       desktop: 1.25, mobile: 0.88, w: 600 },
-    { t: 'CRAFT',       desktop: 1.2, mobile: 0.85, w: 600 },
-    { t: 'VOICE',       desktop: 1.15, mobile: 0.85, w: 600 },
-    { t: 'DRAFT',       desktop: 1.1, mobile: 0.82, w: 600 },
-    { t: 'COVER',       desktop: 1.05, mobile: 0.82, w: 600 },
-    { t: 'LAYOUT',      desktop: 1.0, mobile: 0.8,  w: 600 },
-    { t: 'COLUMN',      desktop: 0.95, mobile: 0.8,  w: 500 },
-    { t: 'SERIF',       desktop: 0.9, mobile: 0.78, w: 600 },
-    { t: 'LENS',        desktop: 0.9, mobile: 0.78, w: 600 },
+    { t: 'INK',         desktop: 1.25, mobile: 0.82, w: 700 },
+    { t: 'STORY',       desktop: 1.2,  mobile: 0.82, w: 600 },
+    { t: 'CRAFT',       desktop: 1.15, mobile: 0.8,  w: 600 },
+    { t: 'VOICE',       desktop: 1.1,  mobile: 0.8,  w: 600 },
+    { t: 'DRAFT',       desktop: 1.05, mobile: 0.78, w: 600 },
+    { t: 'COVER',       desktop: 1.0,  mobile: 0.78, w: 600 },
+    { t: 'LAYOUT',      desktop: 0.95, mobile: 0.75, w: 600 },
+    { t: 'COLUMN',      desktop: 0.9,  mobile: 0.75, w: 500 },
+    { t: 'SERIF',       desktop: 0.85, mobile: 0.72, w: 600 },
+    { t: 'LENS',        desktop: 0.85, mobile: 0.72, w: 600 },
 
-    // Rotated editorial text (vertical page gutters)
-    { t: 'EDITORIAL',   desktop: 2.0, mobile: 1.1,  w: 700, rot: -90 },
-    { t: 'PRINT',       desktop: 1.7, mobile: 1.0,  w: 700, rot: 90 },
-    { t: 'DESIGN',      desktop: 1.8, mobile: 1.05, w: 700, rot: -90 },
-    { t: 'ARCHIVE',     desktop: 1.5, mobile: 0.95, w: 700, rot: 90 },
+    // Rotated vertical terms
+    { t: 'EDITORIAL',   desktop: 1.9,  mobile: 1.0,  w: 700, rot: -90 },
+    { t: 'PRINT',       desktop: 1.6,  mobile: 0.95, w: 700, rot: 90 },
+    { t: 'DESIGN',      desktop: 1.7,  mobile: 0.95, w: 700, rot: -90 },
+    { t: 'ARCHIVE',     desktop: 1.4,  mobile: 0.88, w: 700, rot: 90 },
 
-    // Monospaced markers
-    { t: 'VOL. 26',     desktop: 0.95, mobile: 0.72, w: 700, mono: true },
-    { t: 'ISSUE 01',    desktop: 0.95, mobile: 0.72, w: 700, mono: true },
-    { t: '26\u201427',  desktop: 0.9,  mobile: 0.7,  w: 700, mono: true },
-    { t: 'GECW',        desktop: 0.9,  mobile: 0.7,  w: 800, mono: true },
-    { t: 'EST. 1986',   desktop: 0.85, mobile: 0.68, w: 700, mono: true }
+    // Monospaced masthead markers
+    { t: 'VOL. 26',     desktop: 0.9,  mobile: 0.7,  w: 700, mono: true },
+    { t: 'ISSUE 01',    desktop: 0.9,  mobile: 0.7,  w: 700, mono: true },
+    { t: '26\u201427',  desktop: 0.85, mobile: 0.68, w: 700, mono: true },
+    { t: 'GECW',        desktop: 0.85, mobile: 0.68, w: 800, mono: true },
+    { t: 'EST. 1986',   desktop: 0.8,  mobile: 0.65, w: 700, mono: true }
   ];
 
   /* ── State ── */
@@ -73,15 +74,14 @@
   const rand = (a, b) => a + Math.random() * (b - a);
 
   function calcOpacity(size) {
-    if (size >= 3.0) return rand(0.08, 0.12);
-    if (size >= 1.8) return rand(0.12, 0.17);
-    if (size >= 1.1) return rand(0.16, 0.24);
-    return rand(0.20, 0.30);
+    if (size >= 2.8) return rand(0.08, 0.12);
+    if (size >= 1.6) return rand(0.12, 0.17);
+    if (size >= 1.0) return rand(0.16, 0.23);
+    return rand(0.20, 0.28);
   }
 
   /**
-   * Calculate dynamic exclusion bounding box of the central hero headline wrap.
-   * Elements must strictly stay outside this box at all times.
+   * Calculate central headline exclusion box with safety padding.
    */
   function getHeadlineExclusion() {
     const vw = window.innerWidth;
@@ -90,17 +90,16 @@
 
     if (!headlineWrap) {
       return {
-        left: vw * 0.18,
-        right: vw * 0.82,
-        top: vh * 0.24,
-        bottom: vh * 0.76
+        left: vw * 0.16,
+        right: vw * 0.84,
+        top: vh * 0.22,
+        bottom: vh * 0.78
       };
     }
 
     const rect = headlineWrap.getBoundingClientRect();
-    // Safety buffer around the headline container
-    const padX = isMobile ? 14 : 32;
-    const padY = isMobile ? 12 : 26;
+    const padX = isMobile ? 18 : 36;
+    const padY = isMobile ? 16 : 30;
 
     return {
       left: Math.max(0, rect.left - padX),
@@ -111,7 +110,35 @@
   }
 
   /**
-   * Rebuild all floating typography elements outside the exclusion zone
+   * Check if two Axis-Aligned Bounding Boxes overlap.
+   */
+  function boxesOverlap(a, b) {
+    return !(
+      a.right <= b.left ||
+      a.left >= b.right ||
+      a.bottom <= b.top ||
+      a.top >= b.bottom
+    );
+  }
+
+  /**
+   * Check if a candidate bounding box collides with the headline exclusion
+   * or any previously placed floating card.
+   */
+  function isColliding(candidate, placedBoxes, excl) {
+    // 1. Check headline exclusion
+    if (boxesOverlap(candidate, excl)) return true;
+
+    // 2. Check all previously placed cards
+    for (let i = 0; i < placedBoxes.length; i++) {
+      if (boxesOverlap(candidate, placedBoxes[i])) return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Rebuild all floating typography elements with guaranteed non-overlapping positions.
    */
   function build() {
     layer.innerHTML = '';
@@ -123,19 +150,22 @@
     const excl = getHeadlineExclusion();
     cachedExcl = excl;
 
-    // Available space measurements
+    // Spatial bounding box records for all placed items
+    const placedBoxes = [];
+
+    // Layout margins
     const navBottom = isMobile ? 65 : 75;
-    const topBandHeight = excl.top - navBottom;
-    const bottomBandHeight = (vh - (isMobile ? 15 : 25)) - excl.bottom;
-    const leftMarginWidth = excl.left;
-    const rightMarginWidth = vw - excl.right;
+    const screenBottom = vh - (isMobile ? 18 : 25);
+    const badgeAvoidRadius = isMobile ? 88 : 0; // avoid bottom-left badge on phone
 
-    // Mobile: clean 16 items focused on top & bottom bands
-    // Desktop: full 35 items distributed across all 4 zones
-    const wordCount = isMobile ? 16 : WORDS.length;
+    // Collision safety buffer: ensures items don't touch even during drift
+    const safetyBuffer = isMobile ? 18 : 32;
 
-    /* ── 1. Words ── */
-    for (let i = 0; i < wordCount; i++) {
+    // Target element count based on screen capacity
+    const maxTarget = isMobile ? 12 : 28;
+
+    /* ── 1. Place Words ── */
+    for (let i = 0; i < WORDS.length && items.length < maxTarget; i++) {
       const word = WORDS[i];
       const size = isMobile ? word.mobile : word.desktop;
       const rotation = word.rot || 0;
@@ -154,105 +184,131 @@
       el.style.fontSize = size + 'rem';
       el.style.fontWeight = word.w;
 
-      // Add to DOM first to accurately measure rendered dimensions
+      // Append temporarily to measure accurate rendered dimensions
       layer.appendChild(el);
-      const elemW = el.offsetWidth || (size * 16 * (word.t.length * 0.6));
-      const elemH = el.offsetHeight || (size * 16 * 1.2);
+      const elemW = el.offsetWidth || 70;
+      const elemH = el.offsetHeight || 22;
 
-      const ampX = rand(2, isMobile ? 5 : 10);
-      const ampY = rand(2, isMobile ? 4 : 8);
+      // Motion drift amplitudes
+      const ampX = rand(2, isMobile ? 4 : 8);
+      const ampY = rand(1.5, isMobile ? 3 : 6);
 
-      // Determine valid placement zones where element + motion fits outside exclusion
-      // Zones: 0 = Top, 1 = Bottom, 2 = Left, 3 = Right
-      const candidateZones = [];
+      // Determine candidate zones where this element can fit
+      // 0 = Top band, 1 = Bottom band, 2 = Left column, 3 = Right column
+      const validZones = [];
 
       // Top band check
-      if (topBandHeight > elemH + ampY * 2 + 8) {
-        candidateZones.push(0);
-      }
+      if (excl.top - navBottom > elemH + ampY * 2 + 10) validZones.push(0);
       // Bottom band check
-      if (bottomBandHeight > elemH + ampY * 2 + 8) {
-        candidateZones.push(1);
-      }
-      // Left column check (only if enough horizontal margin)
-      if (leftMarginWidth > elemW + ampX * 2 + 12) {
-        candidateZones.push(2);
-      }
-      // Right column check (only if enough horizontal margin)
-      if (rightMarginWidth > elemW + ampX * 2 + 12) {
-        candidateZones.push(3);
+      if (screenBottom - excl.bottom > elemH + ampY * 2 + 10) validZones.push(1);
+      // Left column check (desktop, or narrow items on phone)
+      if (excl.left > elemW + ampX * 2 + 14) validZones.push(2);
+      // Right column check (desktop, or narrow items on phone)
+      if (vw - excl.right > elemW + ampX * 2 + 14) validZones.push(3);
+
+      if (validZones.length === 0) {
+        layer.removeChild(el);
+        continue;
       }
 
-      // Fallback: If margins are too narrow (e.g. mobile), default to Top (0) or Bottom (1)
-      let zoneType;
-      if (candidateZones.length > 0) {
-        zoneType = candidateZones[i % candidateZones.length];
+      // Try candidate positions across the valid zones
+      let placed = false;
+      let chosenX = 0;
+      let chosenY = 0;
+      let chosenZone = 0;
+      let chosenCandidateBox = null;
+
+      // Try up to 40 random placements to find a collision-free spot
+      const preferredZone = validZones[i % validZones.length];
+      const searchZones = [preferredZone, ...validZones.filter(z => z !== preferredZone)];
+
+      for (let zIdx = 0; zIdx < searchZones.length && !placed; zIdx++) {
+        const zone = searchZones[zIdx];
+
+        let minX = 0, maxX = 0, minY = 0, maxY = 0;
+
+        if (zone === 0) {
+          // Top band
+          minY = navBottom + 6;
+          maxY = Math.max(minY, excl.top - elemH - ampY - 8);
+          minX = 12;
+          maxX = Math.max(minX, vw - elemW - ampX - 12);
+        } else if (zone === 1) {
+          // Bottom band
+          minY = excl.bottom + ampY + 8;
+          maxY = Math.max(minY, screenBottom - elemH - ampY - 8);
+          minX = isMobile ? badgeAvoidRadius : 18;
+          maxX = Math.max(minX, vw - elemW - ampX - 18);
+        } else if (zone === 2) {
+          // Left column
+          minX = 8;
+          maxX = Math.max(minX, excl.left - elemW - ampX - 10);
+          minY = Math.max(navBottom + 10, excl.top);
+          maxY = Math.max(minY, excl.bottom - elemH);
+        } else {
+          // Right column
+          minX = excl.right + ampX + 10;
+          maxX = Math.max(minX, vw - elemW - ampX - 10);
+          minY = Math.max(navBottom + 10, excl.top);
+          maxY = Math.max(minY, excl.bottom - elemH);
+        }
+
+        if (maxX < minX || maxY < minY) continue;
+
+        for (let attempt = 0; attempt < 35; attempt++) {
+          const tryX = rand(minX, maxX);
+          const tryY = rand(minY, maxY);
+
+          // Bounding box with drift amplitude and safety buffer
+          const candidate = {
+            left: tryX - ampX - safetyBuffer,
+            right: tryX + elemW + ampX + safetyBuffer,
+            top: tryY - ampY - safetyBuffer,
+            bottom: tryY + elemH + ampY + safetyBuffer
+          };
+
+          if (!isColliding(candidate, placedBoxes, excl)) {
+            // Found a valid, completely non-overlapping position!
+            placed = true;
+            chosenX = tryX;
+            chosenY = tryY;
+            chosenZone = zone;
+            chosenCandidateBox = candidate;
+            break;
+          }
+        }
+      }
+
+      if (placed) {
+        placedBoxes.push(chosenCandidateBox);
+        const op = calcOpacity(size);
+
+        items.push({
+          el,
+          baseX: chosenX,
+          baseY: chosenY,
+          w: elemW,
+          h: elemH,
+          zoneType: chosenZone,
+          targetOp: op,
+          curOp: 0,
+          rotation,
+          ampX,
+          ampY,
+          freqX: rand(0.0003, 0.00065),
+          freqY: rand(0.0003, 0.0006),
+          phase: rand(0, Math.PI * 2),
+          parallax: isMobile ? 0 : (size > 2.0 ? rand(10, 18) : rand(3, 8)),
+          revealed: false
+        });
       } else {
-        zoneType = (i % 2 === 0) ? 0 : 1;
+        // No non-overlapping spot could be found: omit cleanly
+        layer.removeChild(el);
       }
-
-      let bx = 0;
-      let by = 0;
-
-      if (zoneType === 0) {
-        // TOP BAND (between navbar and headline)
-        const minY = navBottom + 4;
-        const maxY = Math.max(minY, excl.top - elemH - ampY - 6);
-        by = rand(minY, maxY);
-        const minX = 12;
-        const maxX = Math.max(minX, vw - elemW - ampX - 12);
-        bx = rand(minX, maxX);
-      } else if (zoneType === 1) {
-        // BOTTOM BAND (below Apply button)
-        const minY = excl.bottom + ampY + 8;
-        const maxY = Math.max(minY, vh - elemH - ampY - (isMobile ? 18 : 25));
-        by = rand(minY, maxY);
-        // Avoid floating yellow badge on bottom-left on mobile
-        const minX = isMobile ? Math.min(88, vw * 0.25) : 20;
-        const maxX = Math.max(minX, vw - elemW - ampX - 20);
-        bx = rand(minX, maxX);
-      } else if (zoneType === 2) {
-        // LEFT COLUMN (desktop)
-        const minX = 8;
-        const maxX = Math.max(minX, excl.left - elemW - ampX - 8);
-        bx = rand(minX, maxX);
-        const minY = Math.max(navBottom + 10, excl.top);
-        const maxY = Math.max(minY, excl.bottom - elemH);
-        by = rand(minY, maxY);
-      } else {
-        // RIGHT COLUMN (desktop)
-        const minX = excl.right + ampX + 8;
-        const maxX = Math.max(minX, vw - elemW - ampX - 12);
-        bx = rand(minX, maxX);
-        const minY = Math.max(navBottom + 10, excl.top);
-        const maxY = Math.max(minY, excl.bottom - elemH);
-        by = rand(minY, maxY);
-      }
-
-      const op = calcOpacity(size);
-
-      items.push({
-        el,
-        baseX: bx,
-        baseY: by,
-        w: elemW,
-        h: elemH,
-        zoneType,
-        targetOp: op,
-        curOp: 0,
-        rotation,
-        ampX,
-        ampY,
-        freqX: rand(0.0003, 0.0007),
-        freqY: rand(0.0003, 0.00065),
-        phase: rand(0, Math.PI * 2),
-        parallax: isMobile ? 0 : (size > 2.2 ? rand(12, 22) : (size > 1.2 ? rand(6, 12) : rand(2, 6))),
-        revealed: false
-      });
     }
 
-    /* ── 2. Editorial Decorative Marks (Lines, Crosses, Dots) ── */
-    const decorCount = isMobile ? 4 : 10;
+    /* ── 2. Place Decorative Marks (Lines, Crosses, Dots) ── */
+    const decorCount = isMobile ? 3 : 8;
     for (let d = 0; d < decorCount; d++) {
       const dType = d % 3;
       let del;
@@ -260,7 +316,7 @@
       if (dType === 0) {
         del = document.createElement('div');
         del.className = 'mag-line';
-        del.style.width = rand(isMobile ? 24 : 40, isMobile ? 45 : 85) + 'px';
+        del.style.width = rand(isMobile ? 22 : 35, isMobile ? 40 : 70) + 'px';
       } else if (dType === 1) {
         del = document.createElement('div');
         del.className = 'mag-cross';
@@ -270,41 +326,69 @@
       }
 
       layer.appendChild(del);
-      const dW = del.offsetWidth || 15;
-      const dH = del.offsetHeight || 15;
+      const dW = del.offsetWidth || 14;
+      const dH = del.offsetHeight || 14;
+      const ampX = 1.5;
+      const ampY = 1.5;
 
-      const zoneType = (d % 2 === 0) ? 0 : 1;
-      let dx = 0;
-      let dy = 0;
+      let placed = false;
+      let chosenX = 0;
+      let chosenY = 0;
+      let chosenCandidate = null;
 
-      if (zoneType === 0) {
-        dy = rand(navBottom + 5, Math.max(navBottom + 6, excl.top - dH - 8));
-        dx = rand(15, vw - dW - 15);
-      } else {
-        dy = rand(excl.bottom + 8, Math.max(excl.bottom + 10, vh - dH - 20));
-        dx = rand(isMobile ? 90 : 25, vw - dW - 20);
+      for (let attempt = 0; attempt < 30; attempt++) {
+        const zone = (attempt % 2 === 0) ? 0 : 1;
+        let tryX = 0, tryY = 0;
+
+        if (zone === 0) {
+          tryY = rand(navBottom + 6, Math.max(navBottom + 8, excl.top - dH - 8));
+          tryX = rand(15, vw - dW - 15);
+        } else {
+          tryY = rand(excl.bottom + 8, Math.max(excl.bottom + 10, screenBottom - dH - 12));
+          tryX = rand(isMobile ? badgeAvoidRadius : 20, vw - dW - 20);
+        }
+
+        const candidate = {
+          left: tryX - ampX - (isMobile ? 12 : 20),
+          right: tryX + dW + ampX + (isMobile ? 12 : 20),
+          top: tryY - ampY - (isMobile ? 12 : 20),
+          bottom: tryY + dH + ampY + (isMobile ? 12 : 20)
+        };
+
+        if (!isColliding(candidate, placedBoxes, excl)) {
+          placed = true;
+          chosenX = tryX;
+          chosenY = tryY;
+          chosenCandidate = candidate;
+          break;
+        }
       }
 
-      const decorOp = isMobile ? rand(0.12, 0.18) : rand(0.14, 0.22);
+      if (placed) {
+        placedBoxes.push(chosenCandidate);
+        const decorOp = isMobile ? rand(0.12, 0.16) : rand(0.14, 0.20);
 
-      items.push({
-        el: del,
-        baseX: dx,
-        baseY: dy,
-        w: dW,
-        h: dH,
-        zoneType,
-        targetOp: decorOp,
-        curOp: 0,
-        rotation: 0,
-        ampX: rand(1.5, 4),
-        ampY: rand(1, 3),
-        freqX: rand(0.0004, 0.0008),
-        freqY: rand(0.0003, 0.00075),
-        phase: rand(0, Math.PI * 2),
-        parallax: 0,
-        revealed: false
-      });
+        items.push({
+          el: del,
+          baseX: chosenX,
+          baseY: chosenY,
+          w: dW,
+          h: dH,
+          zoneType: (chosenY < excl.top ? 0 : 1),
+          targetOp: decorOp,
+          curOp: 0,
+          rotation: 0,
+          ampX,
+          ampY,
+          freqX: rand(0.0004, 0.0007),
+          freqY: rand(0.0003, 0.00065),
+          phase: rand(0, Math.PI * 2),
+          parallax: 0,
+          revealed: false
+        });
+      } else {
+        layer.removeChild(del);
+      }
     }
 
     staggerReveal();
@@ -325,7 +409,7 @@
     items.forEach((it, idx) => {
       setTimeout(() => {
         it.revealed = true;
-      }, 30 + idx * 20);
+      }, 25 + idx * 18);
     });
   }
 
@@ -338,7 +422,7 @@
   }
 
   /**
-   * Main 60 fps Animation Loop with real-time perimeter boundary enforcement
+   * Main 60 fps Animation Loop with boundary clamps
    */
   function tick(ts) {
     if (!lastTs) lastTs = ts;
@@ -355,7 +439,7 @@
       if (!it.revealed) continue;
 
       if (it.curOp < it.targetOp) {
-        it.curOp = Math.min(it.targetOp, it.curOp + 0.01);
+        it.curOp = Math.min(it.targetOp, it.curOp + 0.012);
       }
 
       if (reducedMotion) {
@@ -363,7 +447,7 @@
         continue;
       }
 
-      // Drift calculation
+      // Smooth drift
       const driftX = Math.sin(elapsed * it.freqX + it.phase) * it.ampX;
       const driftY = Math.cos(elapsed * it.freqY + it.phase) * it.ampY;
 
@@ -374,28 +458,23 @@
       let x = it.baseX + driftX + px;
       let y = it.baseY + driftY + py;
 
-      // STRICT COLLISION ENFORCEMENT:
-      // Guarantee the element never enters the central exclusion box
+      // Motion boundary clamp against headline
       if (it.zoneType === 0) {
-        // Top zone: element's bottom must strictly stay above the headline top
         y = Math.min(y, excl.top - it.h - 4);
       } else if (it.zoneType === 1) {
-        // Bottom zone: element's top must strictly stay below the Apply button
         y = Math.max(y, excl.bottom + 4);
       } else if (it.zoneType === 2) {
-        // Left column: element's right edge must strictly stay left of the headline
         x = Math.min(x, excl.left - it.w - 4);
       } else if (it.zoneType === 3) {
-        // Right column: element's left edge must strictly stay right of the headline
         x = Math.max(x, excl.right + 4);
       }
 
       // Subtle rotation drift
-      const rotWobble = Math.sin(elapsed * 0.0003 + it.phase) * 1.2;
+      const rotWobble = Math.sin(elapsed * 0.0003 + it.phase) * 1.1;
       const totalRot = it.rotation + rotWobble;
 
-      // Organic breathing opacity
-      const breathe = it.curOp * (0.93 + 0.07 * Math.sin(elapsed * 0.0009 + it.phase));
+      // Gentle breathing opacity
+      const breathe = it.curOp * (0.94 + 0.06 * Math.sin(elapsed * 0.0009 + it.phase));
 
       it.el.style.opacity = breathe.toFixed(3);
       it.el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) rotate(${totalRot.toFixed(1)}deg)`;
