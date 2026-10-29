@@ -1,0 +1,459 @@
+/* ==========================================================================
+   SECTION 1: HERO & NAVBAR STYLES
+   Exact recreation of the reference video aesthetic
+   ========================================================================== */
+
+/* Hero Container */
+.hero-section {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  min-height: 640px;
+  background-color: var(--bg-cream);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: 1;
+}
+
+/* --------------------------------------------------------------------------
+   NAVBAR
+   -------------------------------------------------------------------------- */
+.site-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 1.5rem clamp(1.2rem, 3.5vw, 3rem);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 30;
+  pointer-events: none; /* Let background clicks pass through empty spaces */
+}
+
+.site-header * {
+  pointer-events: auto;
+}
+
+/* Left Brand & Search Group */
+.nav-brand-group {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+}
+
+.brand-logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  flex-shrink: 0;
+  display: block;
+  transition: transform var(--transition-fast, 0.2s) ease;
+}
+
+.nav-brand:hover .brand-logo {
+  transform: scale(1.06);
+}
+
+.brand-text-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-main {
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dark);
+  line-height: 1.1;
+}
+
+.brand-sub {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.brand-divider {
+  width: 1px;
+  height: 22px;
+  background-color: var(--border-subtle);
+}
+
+.nav-search-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-dark);
+  border: 1px solid transparent;
+  transition: all var(--transition-fast);
+}
+
+.nav-search-btn:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+  border-color: var(--border-subtle);
+}
+
+/* Right Nav Group (Pills + Dropdown) */
+.nav-right-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.nav-pill-list {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  list-style: none;
+  background-color: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 0.3rem 0.35rem;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.03);
+}
+
+.nav-pill-item a {
+  display: inline-block;
+  padding: 0.45rem 1rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-dark);
+  background: transparent;
+  transition: all var(--transition-fast);
+}
+
+.nav-pill-item a:hover {
+  background-color: #FFFFFF;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.nav-pill-item.apply-pill a {
+  background-color: var(--text-dark);
+  color: #FFFFFF;
+}
+
+.nav-pill-item.apply-pill a:hover {
+  background-color: #000000;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* --------------------------------------------------------------------------
+   CENTERED HEADLINE
+   -------------------------------------------------------------------------- */
+.hero-center-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.hero-headline-wrap {
+  position: relative;
+  text-align: center;
+  max-width: 820px;
+  padding: 2.5rem 2rem;
+  pointer-events: auto;
+  user-select: none;
+}
+
+.hero-tagline {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-orange);
+  margin-bottom: 1.25rem;
+}
+
+.hero-headline {
+  font-family: var(--font-sans);
+  font-size: clamp(2.2rem, 4.4vw, 3.6rem);
+  font-weight: 550;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+  color: var(--text-dark);
+  margin-bottom: 1.25rem;
+  text-align: center;
+}
+
+.hero-headline span {
+  display: inline-block;
+}
+
+.hero-subline {
+  font-size: clamp(0.85rem, 1.2vw, 1rem);
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+/* --------------------------------------------------------------------------
+   HERO APPLY NOW CTA BUTTON
+   Light orange button with black transition on mouse hover and mobile touch
+   -------------------------------------------------------------------------- */
+.hero-cta-wrap {
+  margin-top: 1.85rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero-apply-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  background-color: #FFA266; /* Light Orange */
+  color: #FFFFFF;
+  padding: 0.85rem 2.2rem;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(255, 162, 102, 0.38);
+  transition: background-color 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              color 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+/* Mouse hover and mobile touch state: Turn Black */
+.hero-apply-btn:hover,
+.hero-apply-btn:active,
+.hero-apply-btn:focus-visible {
+  background-color: #121314; /* Deep Black */
+  color: #FFFFFF;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(18, 19, 20, 0.28);
+}
+
+.hero-apply-btn svg {
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero-apply-btn:hover svg,
+.hero-apply-btn:active svg {
+  transform: translate(2px, -2px);
+}
+
+/* --------------------------------------------------------------------------
+   MAGAZINE EDITORIAL TYPOGRAPHY WALL
+   Floating words and decorative marks behind the hero headline
+   -------------------------------------------------------------------------- */
+.floating-cards-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 5;
+}
+
+/* ── Word elements ── */
+.mag-word {
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dark);
+  white-space: nowrap;
+  will-change: transform, opacity;
+  pointer-events: none;
+  user-select: none;
+  line-height: 1;
+  opacity: 0;
+}
+
+.mag-word.mono {
+  font-family: var(--font-mono);
+  letter-spacing: 0.14em;
+}
+
+.mag-word.accent {
+  color: var(--accent-orange);
+}
+
+/* Subtle orange underline on select words */
+.mag-word.underlined {
+  position: absolute;
+}
+.mag-word.underlined::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 65%;
+  height: 2px;
+  background: var(--accent-orange);
+  opacity: 0.55;
+  border-radius: 1px;
+}
+
+/* ── Thin editorial line ── */
+.mag-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 1px;
+  background: var(--text-dark);
+  will-change: transform, opacity;
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* ── Cross mark (+) ── */
+.mag-cross {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 14px;
+  height: 14px;
+  will-change: transform, opacity;
+  pointer-events: none;
+  opacity: 0;
+}
+.mag-cross::before,
+.mag-cross::after {
+  content: '';
+  position: absolute;
+  background: var(--text-dark);
+}
+.mag-cross::before {
+  width: 14px;
+  height: 1px;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
+.mag-cross::after {
+  width: 1px;
+  height: 14px;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+}
+
+/* ── Small dot ── */
+.mag-dot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--text-dark);
+  will-change: transform, opacity;
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* --------------------------------------------------------------------------
+   SMALL YELLOW CIRCULAR FLOATING BADGE (BOTTOM-LEFT)
+   Acts as an "Apply" shortcut button
+   -------------------------------------------------------------------------- */
+.floating-apply-badge {
+  position: fixed;
+  bottom: 28px;
+  left: 28px;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background-color: var(--accent-yellow);
+  color: var(--text-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14), 0 2px 6px rgba(0, 0, 0, 0.08);
+  z-index: 80;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform var(--transition-fast), background-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.floating-apply-badge:hover {
+  background-color: var(--accent-yellow-hover);
+  transform: scale(1.08) rotate(4deg);
+  box-shadow: 0 12px 30px rgba(255, 208, 38, 0.4), 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+.badge-spinner {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  animation: badgeSpin 16s linear infinite;
+}
+
+.badge-spinner svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.badge-spinner text {
+  font-size: 8.5px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  fill: var(--text-dark);
+}
+
+.badge-center-icon {
+  position: relative;
+  z-index: 2;
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dark);
+  transition: transform var(--transition-fast);
+}
+
+.floating-apply-badge:hover .badge-center-icon {
+  transform: translate(2px, -2px);
+}
+
+@keyframes badgeSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+

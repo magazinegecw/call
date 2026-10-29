@@ -1,0 +1,321 @@
+/* ==========================================================================
+   SECTION 2: SCROLL TRANSITION (CURTAIN REVEAL)
+   Pinned hero transition, full-bleed team visual, and editorial overlay
+   ========================================================================== */
+
+/* Curtain Section Container:
+   Pinned during scroll; the curtain panel itself slides up from translateY(100%) to 0% */
+.curtain-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.curtain-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #121315;
+  background-image: url('../assets/team.jpg');
+  background-size: cover;
+  background-position: center center;
+  transform: translateY(100%);
+  will-change: transform;
+  pointer-events: auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.4);
+}
+
+/* Dark overlay (~55% black + subtle bottom gradient for text contrast) */
+.curtain-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(14, 15, 17, 0.45) 0%,
+    rgba(14, 15, 17, 0.55) 45%,
+    rgba(12, 13, 15, 0.85) 100%
+  );
+  z-index: 1;
+}
+
+/* Top bar on the curtain panel (optional subtle header info) */
+.curtain-top-bar {
+  position: relative;
+  z-index: 5;
+  padding: 2rem clamp(1.5rem, 4vw, 4rem);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.curtain-brand-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.curtain-edition-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.3rem 0.8rem;
+  border-radius: var(--radius-pill);
+  backdrop-filter: blur(8px);
+}
+
+/* --------------------------------------------------------------------------
+   CURTAIN BOTTOM CONTENT (EXACT REFERENCE SPECIFICATION)
+   -------------------------------------------------------------------------- */
+.curtain-bottom-content {
+  position: relative;
+  z-index: 5;
+  width: 100%;
+  padding: clamp(2rem, 5vw, 4.5rem) clamp(1.5rem, 4vw, 4rem);
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) auto;
+  align-items: flex-end;
+  gap: 2.5rem;
+}
+
+/* Bottom-Left Group */
+.curtain-left-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  max-width: 820px;
+}
+
+.curtain-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.curtain-counter {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #FFFFFF;
+  background-color: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(8px);
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-pill);
+  line-height: 1;
+}
+
+.curtain-tag-pill {
+  background-color: var(--accent-orange);
+  color: #FFFFFF;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.4rem 1rem;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 4px 14px rgba(255, 90, 31, 0.35);
+  line-height: 1;
+}
+
+/* Staggered text mask wrappers for crisp reveals */
+.curtain-headline-wrap {
+  overflow: hidden;
+}
+
+.curtain-headline {
+  font-family: var(--font-sans);
+  color: #FFFFFF;
+  font-size: clamp(2rem, 3.8vw, 3.2rem);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  margin: 0;
+  will-change: transform, opacity;
+}
+
+.curtain-headline .word-highlight {
+  color: #FFFFFF;
+  text-decoration: underline;
+  text-decoration-color: var(--accent-orange);
+  text-underline-offset: 6px;
+  text-decoration-thickness: 3px;
+}
+
+/* CTA and Scroll Guide Row */
+.curtain-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-top: 0.75rem;
+}
+
+.curtain-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  background-color: #FFFFFF;
+  color: var(--text-dark);
+  padding: 0.85rem 1.8rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: all var(--transition-fast);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+}
+
+.curtain-cta-btn:hover {
+  background-color: #F2EFE9;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+}
+
+.curtain-cta-btn svg {
+  transition: transform var(--transition-fast);
+}
+
+.curtain-cta-btn:hover svg {
+  transform: translateX(3px);
+}
+
+/* Bottom-center-left: "Scroll to explore" */
+.curtain-scroll-guide {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.scroll-arrow-anim {
+  display: inline-flex;
+  animation: bounceDown 1.8s ease-in-out infinite;
+}
+
+@keyframes bounceDown {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
+}
+
+/* --------------------------------------------------------------------------
+   BOTTOM-RIGHT CATALOG CARD (EXACT REFERENCE SPECIFICATION)
+   Small white card with "Applications open" tag and small arrow
+   -------------------------------------------------------------------------- */
+.curtain-catalog-card {
+  background-color: #FFFFFF;
+  border-radius: var(--radius-md);
+  padding: 1.25rem 1.4rem;
+  width: 250px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.curtain-catalog-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.45);
+}
+
+.catalog-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.catalog-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-orange);
+  background: rgba(255, 90, 31, 0.1);
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-pill);
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--accent-orange);
+  box-shadow: 0 0 8px var(--accent-orange);
+  animation: pulseDot 2s infinite ease-in-out;
+}
+
+@keyframes pulseDot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.6; }
+}
+
+.catalog-card-body h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  line-height: 1.25;
+  margin-bottom: 0.25rem;
+}
+
+.catalog-card-body p {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+.catalog-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.6rem;
+  border-top: 1px solid #EFEBE5;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-dark);
+}
+
+.catalog-arrow {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: var(--bg-cream);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform var(--transition-fast), background-color var(--transition-fast);
+}
+
+.curtain-catalog-card:hover .catalog-arrow {
+  background-color: var(--text-dark);
+  color: #FFFFFF;
+  transform: translateX(3px);
+}
+
