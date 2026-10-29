@@ -40,6 +40,7 @@
   const successCard = document.querySelector('.submission-success-card');
   const errorBanner = document.querySelector('.submission-error-banner');
   const btnRetry = document.querySelector('.btn-retry');
+  const btnErrorContact = document.querySelector('.btn-error-contact');
 
   // Input & Control Elements
   const inputFullName = document.getElementById('field-fullname');
@@ -502,8 +503,19 @@
   function setupRetry() {
     if (btnRetry) {
       btnRetry.addEventListener('click', () => {
-        errorBanner.classList.remove('visible');
+        if (errorBanner) errorBanner.classList.remove('visible');
         handleFinalSubmission();
+      });
+    }
+
+    if (btnErrorContact) {
+      btnErrorContact.addEventListener('click', (e) => {
+        if (e) e.preventDefault();
+        const modal = document.getElementById('contact-modal');
+        if (modal) {
+          modal.classList.add('open');
+          document.body.style.overflow = 'hidden';
+        }
       });
     }
   }
@@ -643,8 +655,8 @@
       targetStep.classList.add('active');
     }
 
-    // Update Progress Bar & Counters
-    const progressPercent = Math.round((stepNum / totalSteps) * 100);
+    // Update Progress Bar & Counters (0% on Step 1 before filling, scaling as steps complete)
+    const progressPercent = stepNum === 1 ? 0 : (stepNum === totalSteps ? 100 : (stepNum - 1) * 10);
     if (progressBar) {
       progressBar.style.width = `${progressPercent}%`;
     }
@@ -784,6 +796,8 @@
         if (errText) {
           errText.textContent = 'Please sign in with your Google account before submitting your application.';
         }
+        if (btnRetry) btnRetry.style.display = 'inline-flex';
+        if (btnErrorContact) btnErrorContact.style.display = 'none';
         errorBanner.classList.add('visible');
       }
       return;
@@ -805,6 +819,8 @@
         if (errText) {
           errText.textContent = 'Apps Script backend is not configured yet. Deploy Code.gs and update APPS_SCRIPT_URL in config.js.';
         }
+        if (btnRetry) btnRetry.style.display = 'inline-flex';
+        if (btnErrorContact) btnErrorContact.style.display = 'none';
         errorBanner.classList.add('visible');
       }
       return;
@@ -848,7 +864,10 @@
         showSuccessScreen();
       } else {
         const errMsg = (result && result.message) ? result.message : 'Submission was rejected by the server.';
-        throw new Error(errMsg);
+        const errCode = (result && result.code) ? result.code : 'SUBMISSION_ERROR';
+        const customErr = new Error(errMsg);
+        customErr.code = errCode;
+        throw customErr;
       }
     } catch (err) {
       console.error('Submission failed:', err);
@@ -856,9 +875,28 @@
       setSubmitLoading(false);
       if (errorBanner) {
         const errText = errorBanner.querySelector('.error-text');
+        const isDuplicate = (err.code === 'DUPLICATE_SUBMISSION') ||
+          (err.message && (
+            err.message.toLowerCase().includes('already been submitted') ||
+            err.message.toLowerCase().includes('duplicate')
+          ));
+
         if (errText) {
-          errText.textContent = err.message || 'Submission failed. Please check your internet connection and try again.';
+          if (isDuplicate) {
+            errText.textContent = err.message || 'An application has already been submitted using this Google account. Please use another account to apply. If you think this is a mistake, please contact us.';
+          } else {
+            errText.textContent = err.message || 'Submission failed. Please check your internet connection and try again.';
+          }
         }
+
+        // Show Contact button ONLY in the case of duplicate submission error; otherwise show Retry
+        if (btnRetry) {
+          btnRetry.style.display = isDuplicate ? 'none' : 'inline-flex';
+        }
+        if (btnErrorContact) {
+          btnErrorContact.style.display = isDuplicate ? 'inline-flex' : 'none';
+        }
+
         errorBanner.classList.add('visible');
       }
     }
@@ -962,6 +1000,9 @@
     if (wizardHeader) wizardHeader.style.display = 'flex';
     if (authBar) authBar.style.display = '';
     if (successCard) successCard.classList.remove('visible');
+    if (errorBanner) errorBanner.classList.remove('visible');
+    if (btnRetry) btnRetry.style.display = 'inline-flex';
+    if (btnErrorContact) btnErrorContact.style.display = 'none';
 
     if (googleIdToken) {
       unlockForm();

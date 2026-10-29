@@ -197,7 +197,7 @@ function doPost(e) {
           return createJsonResponse({
             status: "error",
             code: "DUPLICATE_SUBMISSION",
-            message: "An application has already been submitted using this Google account (" + verifiedStudentEmail + "). If you need to make changes, please contact the union team."
+            message: "An application has already been submitted using this Google account (" + verifiedStudentEmail + "). Please use another account to apply. If you think this is a mistake, please contact us."
           });
         }
       } catch (dupCheckErr) {

@@ -60,7 +60,7 @@
 
 .wizard-progress-bar {
   height: 100%;
-  width: 10%;
+  width: 0%;
   background: linear-gradient(90deg, var(--accent-orange), #FF8042);
   transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -994,6 +994,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .submission-error-banner.visible {
@@ -1004,15 +1005,51 @@
   font-size: 0.88rem;
   color: var(--error-red);
   font-weight: 600;
+  line-height: 1.45;
+  flex: 1 1 240px;
 }
 
 .btn-retry {
   background-color: var(--error-red);
   color: #FFFFFF;
-  padding: 0.4rem 0.9rem;
+  padding: 0.45rem 1rem;
   border-radius: var(--radius-pill);
   font-size: 0.78rem;
   font-weight: 700;
   text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+}
+
+.btn-retry:hover {
+  background-color: #B91C1C;
+  transform: translateY(-1px);
+}
+
+.btn-error-contact {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--text-dark);
+  color: #FFFFFF;
+  padding: 0.5rem 1.25rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+}
+
+.btn-error-contact:hover {
+  background-color: #000000;
+  transform: translateY(-1px);
 }
 
