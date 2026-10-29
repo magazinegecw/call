@@ -20,49 +20,49 @@
   /* ── Magazine Editorial Vocabulary ── */
   const WORDS = [
     // Grand editorial watermarks
-    { t: 'EDITORIAL',   desktop: 3.8, mobile: 1.35, w: 800 },
-    { t: 'NARRATIVE',   desktop: 3.4, mobile: 1.25, w: 800 },
-    { t: 'TYPOGRAPHY',  desktop: 3.0, mobile: 1.2,  w: 800 },
-    { t: 'CHRONICLE',   desktop: 2.6, mobile: 1.15, w: 700 },
-    { t: 'CULTURE',     desktop: 2.4, mobile: 1.1,  w: 700 },
-    { t: 'DESIGN',      desktop: 2.2, mobile: 1.05, w: 700 },
+    { t: 'EDITORIAL', desktop: 3.8, mobile: 1.35, w: 800 },
+    { t: 'NARRATIVE', desktop: 3.4, mobile: 1.25, w: 800 },
+    { t: 'TYPOGRAPHY', desktop: 3.0, mobile: 1.2, w: 800 },
+    { t: 'CHRONICLE', desktop: 2.6, mobile: 1.15, w: 700 },
+    { t: 'CULTURE', desktop: 2.4, mobile: 1.1, w: 700 },
+    { t: 'DESIGN', desktop: 2.2, mobile: 1.05, w: 700 },
 
     // Medium display terms
-    { t: 'PRINT',       desktop: 2.1, mobile: 1.05, w: 700 },
-    { t: 'PRESS',       desktop: 2.0, mobile: 1.0,  w: 700 },
-    { t: 'GAZETTE',     desktop: 1.9, mobile: 1.0,  w: 700 },
-    { t: 'HEADLINE',    desktop: 1.85, mobile: 0.95, w: 700 },
-    { t: 'PUBLISH',     desktop: 1.8, mobile: 0.95, w: 600 },
-    { t: 'ARCHIVE',     desktop: 1.75, mobile: 0.9,  w: 700 },
-    { t: 'VISUAL',      desktop: 1.7, mobile: 0.9,  w: 600 },
-    { t: 'FEATURE',     desktop: 1.6, mobile: 0.88, w: 700 },
-    { t: 'SPREAD',      desktop: 1.5, mobile: 0.88, w: 600 },
-    { t: 'MONTAGE',     desktop: 1.45, mobile: 0.85, w: 600 },
+    { t: 'PRINT', desktop: 2.1, mobile: 1.05, w: 700 },
+    { t: 'PRESS', desktop: 2.0, mobile: 1.0, w: 700 },
+    { t: 'GAZETTE', desktop: 1.9, mobile: 1.0, w: 700 },
+    { t: 'HEADLINE', desktop: 1.85, mobile: 0.95, w: 700 },
+    { t: 'PUBLISH', desktop: 1.8, mobile: 0.95, w: 600 },
+    { t: 'ARCHIVE', desktop: 1.75, mobile: 0.9, w: 700 },
+    { t: 'VISUAL', desktop: 1.7, mobile: 0.9, w: 600 },
+    { t: 'FEATURE', desktop: 1.6, mobile: 0.88, w: 700 },
+    { t: 'SPREAD', desktop: 1.5, mobile: 0.88, w: 600 },
+    { t: 'MONTAGE', desktop: 1.45, mobile: 0.85, w: 600 },
 
     // Fine editorial tags & metadata
-    { t: 'INK',         desktop: 1.25, mobile: 0.82, w: 700 },
-    { t: 'STORY',       desktop: 1.2,  mobile: 0.82, w: 600 },
-    { t: 'CRAFT',       desktop: 1.15, mobile: 0.8,  w: 600 },
-    { t: 'VOICE',       desktop: 1.1,  mobile: 0.8,  w: 600 },
-    { t: 'DRAFT',       desktop: 1.05, mobile: 0.78, w: 600 },
-    { t: 'COVER',       desktop: 1.0,  mobile: 0.78, w: 600 },
-    { t: 'LAYOUT',      desktop: 0.95, mobile: 0.75, w: 600 },
-    { t: 'COLUMN',      desktop: 0.9,  mobile: 0.75, w: 500 },
-    { t: 'SERIF',       desktop: 0.85, mobile: 0.72, w: 600 },
-    { t: 'LENS',        desktop: 0.85, mobile: 0.72, w: 600 },
+    { t: 'INK', desktop: 1.25, mobile: 0.82, w: 700 },
+    { t: 'STORY', desktop: 1.2, mobile: 0.82, w: 600 },
+    { t: 'CRAFT', desktop: 1.15, mobile: 0.8, w: 600 },
+    { t: 'VOICE', desktop: 1.1, mobile: 0.8, w: 600 },
+    { t: 'DRAFT', desktop: 1.05, mobile: 0.78, w: 600 },
+    { t: 'COVER', desktop: 1.0, mobile: 0.78, w: 600 },
+    { t: 'LAYOUT', desktop: 0.95, mobile: 0.75, w: 600 },
+    { t: 'COLUMN', desktop: 0.9, mobile: 0.75, w: 500 },
+    { t: 'SERIF', desktop: 0.85, mobile: 0.72, w: 600 },
+    { t: 'LENS', desktop: 0.85, mobile: 0.72, w: 600 },
 
     // Rotated vertical terms
-    { t: 'EDITORIAL',   desktop: 1.9,  mobile: 1.0,  w: 700, rot: -90 },
-    { t: 'PRINT',       desktop: 1.6,  mobile: 0.95, w: 700, rot: 90 },
-    { t: 'DESIGN',      desktop: 1.7,  mobile: 0.95, w: 700, rot: -90 },
-    { t: 'ARCHIVE',     desktop: 1.4,  mobile: 0.88, w: 700, rot: 90 },
+    { t: 'EDITORIAL', desktop: 1.9, mobile: 1.0, w: 700, rot: -90 },
+    { t: 'PRINT', desktop: 1.6, mobile: 0.95, w: 700, rot: 90 },
+    { t: 'DESIGN', desktop: 1.7, mobile: 0.95, w: 700, rot: -90 },
+    { t: 'ARCHIVE', desktop: 1.4, mobile: 0.88, w: 700, rot: 90 },
 
     // Monospaced masthead markers
-    { t: 'VOL. 26',     desktop: 0.9,  mobile: 0.7,  w: 700, mono: true },
-    { t: 'ISSUE 01',    desktop: 0.9,  mobile: 0.7,  w: 700, mono: true },
-    { t: '26\u201427',  desktop: 0.85, mobile: 0.68, w: 700, mono: true },
-    { t: 'GECW',        desktop: 0.85, mobile: 0.68, w: 800, mono: true },
-    { t: 'EST. 1986',   desktop: 0.8,  mobile: 0.65, w: 700, mono: true }
+    { t: 'VOL. 26', desktop: 0.9, mobile: 0.7, w: 700, mono: true },
+    { t: 'ISSUE 01', desktop: 0.9, mobile: 0.7, w: 700, mono: true },
+    { t: '26\u201427', desktop: 0.85, mobile: 0.68, w: 700, mono: true },
+    { t: 'GECW', desktop: 0.85, mobile: 0.68, w: 800, mono: true },
+    { t: 'EST. 1986', desktop: 0.8, mobile: 0.65, w: 700, mono: true }
   ];
 
   /* ── State ── */
@@ -387,8 +387,8 @@
           rotation: 0,
           ampX,
           ampY,
-          freqX: rand(0.0005, 0.0009),
-          freqY: rand(0.00045, 0.0008),
+          freqX: rand(0.0040, 0.0024),
+          freqY: rand(0.00120, 0.0029),
           phase: rand(0, Math.PI * 2),
           parallax: 0,
           revealed: false
