@@ -671,8 +671,49 @@
     if (!validateCurrentStep()) return;
 
     if (currentStep < totalSteps) {
+      const prevStep = currentStep;
       currentStep++;
       updateStepView(currentStep, true);
+
+      // Targeted mobile auto-scroll for Incident 1 (Step 1 -> 2) and Incident 2 (Step 5 -> 6)
+      handleMobileStepScroll(prevStep, currentStep);
+    }
+  }
+
+  function handleMobileStepScroll(prevStep, nextStep) {
+    // Only apply on mobile viewports
+    if (window.innerWidth > 768) return;
+
+    // Dismiss mobile virtual keyboard if open to stabilize viewport height
+    if (document.activeElement && document.activeElement.blur) {
+      document.activeElement.blur();
+    }
+
+    setTimeout(() => {
+      // Incident 1: After entering Name (Step 1 -> 2), align top of the form card
+      if (prevStep === 1 && nextStep === 2) {
+        const wizardCard = document.querySelector('.wizard-card');
+        if (wizardCard) {
+          smoothScrollToElement(wizardCard, -16);
+        }
+      }
+      // Incident 2: After 5th question (Step 5 -> 6), align the 6th question to the top
+      else if (prevStep === 5 && nextStep === 6) {
+        const question6 = document.querySelector('.step-6 .step-question-group') || document.querySelector('.step-6');
+        if (question6) {
+          smoothScrollToElement(question6, -16);
+        }
+      }
+    }, 60);
+  }
+
+  function smoothScrollToElement(el, offset = 0) {
+    if (!el) return;
+    if (window.AppScroll && window.AppScroll.getLenis && window.AppScroll.getLenis()) {
+      window.AppScroll.scrollTo(el, { offset: offset, duration: 1.0 });
+    } else {
+      const elTop = el.getBoundingClientRect().top + window.pageYOffset + offset;
+      window.scrollTo({ top: Math.max(0, elTop), behavior: 'smooth' });
     }
   }
 
