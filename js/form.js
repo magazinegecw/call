@@ -264,27 +264,73 @@
     const lockBtn = document.getElementById('btn-lock-prompt');
     const formEl = document.getElementById('recruitment-form');
 
-    function handleLockedTrigger(e) {
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let isTouchScroll = false;
+    let touchStartTime = 0;
+    let lastTapHandledTime = 0;
+
+    function handleTapTrigger(e) {
       if (!googleIdToken) {
-        if (e) {
+        if (e && e.cancelable) {
           e.preventDefault();
-          e.stopPropagation();
         }
         highlightAuthPrompt();
       }
     }
 
     if (lockOverlay) {
-      lockOverlay.addEventListener('click', handleLockedTrigger);
-      lockOverlay.addEventListener('touchstart', handleLockedTrigger, { passive: false });
+      // Touchstart: record initial touch coordinates without blocking native scroll
+      lockOverlay.addEventListener('touchstart', (e) => {
+        if (e.touches && e.touches.length > 0) {
+          touchStartX = e.touches[0].clientX;
+          touchStartY = e.touches[0].clientY;
+          isTouchScroll = false;
+          touchStartTime = Date.now();
+        }
+      }, { passive: true });
+
+      // Touchmove: detect whether user is scrolling
+      lockOverlay.addEventListener('touchmove', (e) => {
+        if (!isTouchScroll && e.touches && e.touches.length > 0) {
+          const diffX = e.touches[0].clientX - touchStartX;
+          const diffY = e.touches[0].clientY - touchStartY;
+          // If finger moved more than 8px, user is scrolling the page
+          if (Math.hypot(diffX, diffY) > 8) {
+            isTouchScroll = true;
+          }
+        }
+      }, { passive: true });
+
+      // Touchcancel: user cancelled touch (e.g. system gesture)
+      lockOverlay.addEventListener('touchcancel', () => {
+        isTouchScroll = true;
+      }, { passive: true });
+
+      // Touchend: if user tapped and released without scrolling, trigger shake & prompt
+      lockOverlay.addEventListener('touchend', (e) => {
+        if (!isTouchScroll && (Date.now() - touchStartTime < 500)) {
+          lastTapHandledTime = Date.now();
+          handleTapTrigger(e);
+        }
+      });
+
+      // Click: handles desktop mouse clicks (ignores tap that already fired on touchend)
+      lockOverlay.addEventListener('click', (e) => {
+        if (Date.now() - lastTapHandledTime < 500) return;
+        handleTapTrigger(e);
+      });
     }
 
     if (lockBtn) {
-      lockBtn.addEventListener('click', handleLockedTrigger);
+      lockBtn.addEventListener('click', (e) => {
+        if (Date.now() - lastTapHandledTime < 500) return;
+        handleTapTrigger(e);
+      });
     }
 
     if (formEl) {
-      // Intercept accidental keyboard focus or click underneath the overlay
+      // Intercept accidental keyboard focus underneath the overlay
       formEl.addEventListener('focusin', (e) => {
         if (!googleIdToken) {
           if (e.target && e.target.blur) e.target.blur();

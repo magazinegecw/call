@@ -255,6 +255,7 @@
   padding: 1.5rem;
   border-radius: 0 0 var(--radius-lg) var(--radius-lg);
   cursor: pointer;
+  touch-action: pan-y;
   transition: opacity 0.28s ease, visibility 0.28s ease;
 }
 
@@ -757,6 +758,8 @@
   align-items: center;
   justify-content: center;
   margin-top: 2px;
+  color: transparent;
+  user-select: none;
   transition: all var(--transition-fast);
 }
 
