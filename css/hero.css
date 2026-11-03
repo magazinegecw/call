@@ -210,7 +210,7 @@
 }
 
 .hero-subline {
-  font-size: clamp(0.85rem, 1.2vw, 1rem);
+  font-size: clamp(0.95rem, 1.4vw, 1.15rem);
   font-weight: 500;
   color: var(--text-muted);
   letter-spacing: 0.02em;

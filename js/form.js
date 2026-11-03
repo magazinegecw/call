@@ -238,7 +238,7 @@
         if (btnIframe) {
           try {
             btnIframe.focus();
-          } catch (_) {}
+          } catch (_) { }
         }
       }
 
@@ -839,7 +839,6 @@
       <div class="review-item">
         <span class="review-label">Declaration</span>
         <span class="review-value" style="color: var(--success-green);">&#10003; Confirmed &amp; Signed</span>
-        <button type="button" class="review-edit-btn" data-step="9">Edit</button>
       </div>
     `;
 
