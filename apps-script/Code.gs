@@ -74,7 +74,7 @@ const ALLOWED_SOFTWARE = [
   "Canva",
   "Adobe Creative Suite (Photoshop, Illustrator, InDesign, etc.)",
   "Picsart",
-  "Snapseed",
+  "Figma",
   "CapCut",
   "VN Video Editor",
   "Premiere Pro",
